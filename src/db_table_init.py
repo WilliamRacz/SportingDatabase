@@ -51,25 +51,16 @@ def create_tables(conn):
             season_id   BIGINT REFERENCES seasons(season_id),
             team_id     BIGINT REFERENCES teams(team_id),
 
-            appearances INT,
-            minutes     INT,
-            goals       INT,
-            assists     INT,
-            shots_total INT,
-            shots_on_target INT,
-            passes      INT,
-            accurate_passes INT,
-            pass_accuracy NUMERIC,
-            
-            PRIMARY KEY (player_id, season_id, team_id)
-        );
-    """)
-
-    conn.commit()
-    cur.close()
-    print("Tables created (or already existed).")
-
-if __name__ == "__main__":
-    conn = connect_db("your_db_name", "your_user", "your_password")
-    create_tables(conn)
-    conn.close()
+            -- 1:1 with get_player_season_row (after the keys)
+            appearances                 INT,
+            minutes_played              INT,
+            goals                       INT,
+            shots_total                 INT,
+            shots_on_target             INT,
+            passes                      INT,
+            accurate_passes             INT,
+            accurate_passes_percentage  NUMERIC,
+            key_passes                  INT,
+            dribble_attempts            INT,
+            successful_dribbles         INT,
+    

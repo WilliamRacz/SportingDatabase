@@ -17,6 +17,8 @@ def build_player_season_stats_url(player_id, season_id,resource = None, include 
     return build_url(base, resource, token, include, filters)
 
 
+
+
 def get_player_season_row(player_id, season_id, token):
     url = build_player_season_stats_url(player_id, season_id)
     response = send_request(url)
@@ -34,6 +36,16 @@ def get_player_season_row(player_id, season_id, token):
             value = value["total"]
 
         stats[code] = value
+
+    subs = stats.get("substitutions") or {}
+    sub_in = subs.get("in")
+    sub_out = subs.get("out")
+
+    apg = stats.get("average-points-per-game") or {}
+    avg_points = apg.get("average")
+
+    cb = stats.get("crosses-blocked") or {}
+    crosses_blocked = cb.get("crosses_blocked")
     row = [
         season_id,
         stats.get("appearances"),
@@ -58,21 +70,21 @@ def get_player_season_row(player_id, season_id, token):
         stats.get("total-crosses"),
         stats.get("accurate-crosses"),
         stats.get("shots-blocked"),
-        stats.get("substitutions"),
+        sub_in,
+        sub_out,
         stats.get("hit-woodwork"),
         stats.get("redcards"),
         stats.get("goals-conceded"),
         stats.get("fouls-drawn"),
         stats.get("dribbled-past"),
-        stats.get("rating"),
         stats.get("cleansheets"),
         stats.get("team-wins"),
         stats.get("team-draws"),
         stats.get("team-lost"),
         stats.get("lineups"),
         stats.get("bench"),
-        stats.get("average-points-per-game"),
-        stats.get("crosses-blocked"),
+        avg_points,
+        crosses_blocked
     ]
     return row
 
@@ -86,11 +98,13 @@ def get_player_season_row_detail(player_id, season_id, token):
 
 def build_url(base, resource, token, include=None, filters=None):
     url = f"{base}{resource}?api_token={token}"
+    print(url)
     if include:
         url += f"&include={include}"
     if filters:
         url += f"&filters={filters}"
     return url
+
 
 def build_season_stat_list(player_id, season_list,token):
     player_career_stats = []
@@ -105,7 +119,6 @@ def build_season_list(data):
     # data = json.loads(data.text)
     num_seasons = len(data['data']['statistics'])
     season_list = []
-
 
 
     for x in range(num_seasons):

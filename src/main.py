@@ -19,11 +19,11 @@ filters = None
 
 
 #Functions:
-#build_url              - Given base resource include filter strings            ->  returns HTTP String ready to send                                   seasonPlayerRow = get_player_season_row(player_id, season_id, token)
-#get_player_season_row  - Given Season_id, player_id, token                     ->  returns player/Season row of statistics
-#build_season_list      - Given Response Body of player-season                  ->  returns list of seasons    
-#Has_values             - Given Response Body looks for has_value               ->  returns boolean of has_value
-#build_season_stat_list - Given player_id, season_list                          -> returns 2D list of statistics per player_season 
+#build_url                                  - Given base resource include filter strings            ->  returns HTTP String ready to send                                   seasonPlayerRow = get_player_season_row(player_id, season_id, token)
+#get_player_season_row                      - Given Season_id, player_id, token                     ->  returns player/Season row of statistics
+#build_season_list                          - Given Response Body of player-season                  ->  returns list of seasons    
+#Has_values                                 - Given Response Body looks for has_value               ->  returns boolean of has_value
+#build_season_stat_list                     - Given player_id, season_list                          -> returns 2D list of statistics per player_season 
 #get_player_season_row_detail(player_id, season_id,token)                       -> returns the details of the player-season-row
 
 
@@ -55,7 +55,13 @@ def build_season_stat_list(player_id, season_list,token):
     return player_career_stats
 
 
-# rowVal = get_player_season_row_detail(player_id,season_id, token)
-# print(rowVal['data']['statistics'][0]['has_values'])
+
+
+rowVal = get_player_season_row_detail(player_id,season_id, token)
+print(rowVal['data']['statistics'][0]['has_values'])
+
+
+
+
 player_table = build_season_stat_list(player_id,player_seasons,token)
 print(player_table)

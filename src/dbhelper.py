@@ -23,12 +23,9 @@ def connect_db(db_name, user, password, host="localhost", port="5432"):
         print(f"[DB ERROR] {e}")
         sys.exit(1)
 
-
-
-if __name__ == "__main__":
-    conn = connect_db("postgres", "natwat", "")
-    cur = conn.cursor()
-    cur.execute("SELECT 1;")
-    print("Test query result:", cur.fetchone())
-    cur.close()
-    conn.close()
+PLAYER_SEASON_INSERT = """
+    INSERT INTO player_season_stats (
+        player_id, season_id, team_id,
+        appearances, minutes_played, goals, shots_total, shots_on_target,
+        passes, accurate_passes, accurate_passes_percentage, key_passes,
+        dribble_attempts, succ
