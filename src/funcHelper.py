@@ -9,21 +9,44 @@ token = env.get("SPORTMONKS_API_TOKEN")
 base = "https://api.sportmonks.com/v3/football/"
 
 
+# build_player_season_stats_url(player_id, season_id=None, resource=None, include=None, filters=None) -> str (url)
+    # Builds the SportMonks API URL for a player's season stats; default include=statistics.details.type; used by all season-stat calls.
 
-def build_player_season_stats_url(player_id, season_id,resource = None, include = None, filters = None):
+# get_player_season_row(player_id, season_id, token) -> (team_id: int, row: list)
+#     # Calls API for one (player_id, season_id), parses JSON into team_id + ordered stats list matching PLAYER_SEASON_INSERT (minus player_id).
+
+# get_player_season_row_detail(player_id, season_id, token) -> dict (data)
+#     # Debug helper: returns the full raw JSON for a single (player_id, season_id) request without flattening into a stats row.
+
+# build_url(base, resource, token, include=None, filters=None) -> str (url)
+#     # Low-level URL builder used by build_player_season_stats_url; attaches api_token, include, and filters query parameters.
+
+# build_season_stat_list(player_id, season_list, token) -> list[(team_id, row)]
+#     # For one player_id and a list of season_ids: loops seasons, calls get_player_season_row for each, and collects all (team_id, row) pairs.
+
+# build_season_list(data) -> list[season_id]
+#     # Given raw JSON response containing statistics[]: extracts all season_id values into a flat Python list.
+
+# get_player_season_list(player_id, token) -> list[season_id]
+#     # High-level season discovery: calls API once (no season filter), then uses build_season_list to return all seasons where this player has stats.
+
+
+
+def build_player_season_stats_url(player_id, season_id = None,resource = None, include = None, filters = None):
     if resource == None: resource = f"players/{player_id}"
     if include == None: include = "statistics.details.type"
-    if filters == None: filters = f"playerStatisticSeasons:{season_id}"
+    if filters is None and season_id is not None:
+        filters = f"playerStatisticSeasons:{season_id}"
     return build_url(base, resource, token, include, filters)
-
 
 
 
 def get_player_season_row(player_id, season_id, token):
     url = build_player_season_stats_url(player_id, season_id)
     response = send_request(url)
-    
     data = response
+    print(url)
+    team_id = response['data']['statistics'][0]['team_id']
     details = data["data"]["statistics"][0]["details"]
     stats = {}
     for d in details:
@@ -49,7 +72,7 @@ def get_player_season_row(player_id, season_id, token):
     row = [
         season_id,
         stats.get("appearances"),
-        stats.get("minutes-played"),
+        stats.get("minutes_played"),
         stats.get("goals"),
         stats.get("shots-total"),
         stats.get("shots-on-target"),
@@ -86,7 +109,7 @@ def get_player_season_row(player_id, season_id, token):
         avg_points,
         crosses_blocked
     ]
-    return row
+    return team_id, row
 
 #Mainly A Debugging function
 def get_player_season_row_detail(player_id, season_id, token):
@@ -94,6 +117,7 @@ def get_player_season_row_detail(player_id, season_id, token):
     response = send_request(url)
     data = response
     return data
+
 
 
 def build_url(base, resource, token, include=None, filters=None):
@@ -115,6 +139,7 @@ def build_season_stat_list(player_id, season_list,token):
     return player_career_stats
 
 
+
 def build_season_list(data):
     # data = json.loads(data.text)
     num_seasons = len(data['data']['statistics'])
@@ -127,3 +152,9 @@ def build_season_list(data):
     return season_list
 
 
+def get_player_season_list(player_id, token):
+    url = build_player_season_stats_url(player_id)
+    response = send_request(url)
+    print(response)
+    data = response
+    return build_season_list(data)

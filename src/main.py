@@ -3,10 +3,16 @@ from HTTPHelper import send_request
 from funcHelper import build_url, get_player_season_row, build_season_list,get_player_season_row_detail
 env.load()
 import json
+from dbhelper import upload_player_seasons_stats
+from dbhelper import connect_db
+
+
+
+
 token = env.get("SPORTMONKS_API_TOKEN")
 
 player_id = 52296
-season_id = 16036
+# season_id = 16036
 teamId = 20
 
 base = "https://api.sportmonks.com/v3/football/"
@@ -27,41 +33,37 @@ filters = None
 #get_player_season_row_detail(player_id, season_id,token)                       -> returns the details of the player-season-row
 
 
+
 ul = build_url(base, resource, token, include, filters)
 data = send_request(ul) 
 
 
 
-
-
-player_seasons = build_season_list(data)
-
-
-
-
-# print(get_player_season_row_detail(player_id, season_id,token))
-
-
-def build_season_stat_list(player_id, season_list,token):
-    player_career_stats = []
+# player_seasons = build_season_list(data)
+# # print(get_player_season_row_detail(player_id, season_id,token))
+# def build_season_stat_list(player_id, season_list,token):
+#     player_career_stats = []
     
-    for season in season_list:
-        rowVal = get_player_season_row_detail(player_id,season, token)
-        rowVal['data']['statistics'][0]['has_values']
-        if(rowVal['data']['statistics'][0]['has_values'] == True):
-            player_career_stats.append(get_player_season_row(player_id, season,token))
-        else:
-            print("nah son")
-    return player_career_stats
+#     for season in season_list:
+#         rowVal = get_player_season_row_detail(player_id,season, token)
+#         rowVal['data']['statistics'][0]['has_values']
+#         if(rowVal['data']['statistics'][0]['has_values'] == True):
+#             player_career_stats.append(get_player_season_row(player_id, season,token))
+#         else:
+#             print("nah son")
+#     return player_career_stats
 
 
 
 
-rowVal = get_player_season_row_detail(player_id,season_id, token)
-print(rowVal['data']['statistics'][0]['has_values'])
+
+conn = connect_db("postgres", "natwat", "")
+cur = conn.cursor()
+
+upload_player_seasons_stats(cur, 52296, token)
+
+conn.commit()
 
 
 
-
-player_table = build_season_stat_list(player_id,player_seasons,token)
-print(player_table)
+conn.close()

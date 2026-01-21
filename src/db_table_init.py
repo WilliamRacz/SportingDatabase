@@ -1,5 +1,17 @@
 # create_tables.py
 from dbhelper import connect_db
+def reset_tables(conn):
+    cur = conn.cursor()
+
+    cur.execute("DROP TABLE IF EXISTS player_season_stats CASCADE;")
+    cur.execute("DROP TABLE IF EXISTS players CASCADE;")
+    cur.execute("DROP TABLE IF EXISTS teams CASCADE;")
+    cur.execute("DROP TABLE IF EXISTS seasons CASCADE;")
+    cur.execute("DROP TABLE IF EXISTS leagues CASCADE;")
+
+    conn.commit()
+    cur.close()
+
 
 def create_tables(conn):
     cur = conn.cursor()
@@ -33,6 +45,8 @@ def create_tables(conn):
         );
     """)
 
+
+
     # 4) players
     cur.execute("""
         CREATE TABLE IF NOT EXISTS players (
@@ -63,4 +77,44 @@ def create_tables(conn):
             key_passes                  INT,
             dribble_attempts            INT,
             successful_dribbles         INT,
-    
+            tackles                     INT,
+            interceptions               INT,
+            clearances                  INT,
+            total_duels                 INT,
+            duels_won                   INT,
+            aerials_won                 INT,
+            fouls                       INT,
+            dispossessed                INT,
+            total_crosses               INT,
+            accurate_crosses            INT,
+            shots_blocked               INT,
+            sub_in                      INT,
+            sub_out                     INT,
+            hit_woodwork                INT,
+            redcards                    INT,
+            goals_conceded              INT,
+            fouls_drawn                 INT,
+            dribbled_past               INT,
+            cleansheets                 INT,
+            team_wins                   INT,
+            team_draws                  INT,
+            team_lost                   INT,
+            lineups                     INT,
+            bench                       INT,
+            avg_points                  NUMERIC,
+            crosses_blocked             INT,
+
+            PRIMARY KEY (player_id, season_id, team_id)
+        );
+    """)
+
+
+    conn.commit()
+    cur.close()
+    print("Tables created (or already existed).")
+
+if __name__ == "__main__":
+    conn = connect_db("postgres", "natwat", "")
+    reset_tables(conn)
+    create_tables(conn)
+    conn.close()
